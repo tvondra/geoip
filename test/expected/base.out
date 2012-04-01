@@ -1,0 +1,2 @@
+\set ECHO 0
+ROLLBACK;
