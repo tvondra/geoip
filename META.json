@@ -9,7 +9,7 @@
    "provides": {
       "geoip": {
          "file": "sql/geoip--0.0.1.sql",
-         "docfile": "doc/README.md",
+         "docfile": "README.md",
          "version": "0.0.1"
       }
    },
