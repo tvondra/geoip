@@ -2,15 +2,15 @@
    "name": "geoip",
    "abstract": "Geolocation using GeoIP.",
    "description": "Provides geolocation (determining country, city etc. from an IP address) using GeoIP data.",
-   "version": "0.0.1",
+   "version": "0.0.2",
    "maintainer": "Tomas Vondra <tv@fuzzy.cz>",
    "license": "bsd",
 
    "provides": {
       "geoip": {
-         "file": "sql/geoip--0.0.1.sql",
+         "file": "sql/geoip--0.0.2.sql",
          "docfile": "README.md",
-         "version": "0.0.1"
+         "version": "0.0.2"
       }
    },
 
