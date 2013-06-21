@@ -57,7 +57,7 @@ CREATE OR REPLACE FUNCTION geoip_city_location(p_ip INET) RETURNS INT AS $$
 
     SELECT loc_id
       FROM geoip_city_block
-     WHERE $1 >= begin_ip ORDER BY begin_ip DESC LIMIT 1;
+     WHERE $1 >= begin_ip and $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
 
