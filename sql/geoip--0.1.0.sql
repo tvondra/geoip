@@ -48,7 +48,7 @@ CREATE OR REPLACE FUNCTION geoip_country_code(p_ip INET) RETURNS CHAR(2) AS $$
 
     SELECT country
       FROM geoip_country
-     WHERE $1 >= begin_ip ORDER BY begin_ip DESC LIMIT 1;
+     WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
 
@@ -57,7 +57,7 @@ CREATE OR REPLACE FUNCTION geoip_city_location(p_ip INET) RETURNS INT AS $$
 
     SELECT loc_id
       FROM geoip_city_block
-     WHERE $1 >= begin_ip ORDER BY begin_ip DESC LIMIT 1;
+     WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
 
@@ -69,7 +69,7 @@ CREATE OR REPLACE FUNCTION geoip_city(p_ip INET, OUT loc_id INT, OUT country CHA
 
     SELECT l.loc_id, country, region, city, postal_code, latitude, longitude, metro_code, area_code
       FROM geoip_city_block b JOIN geoip_city_location l ON (b.loc_id = l.loc_id)
-     WHERE $1 >= begin_ip ORDER BY begin_ip DESC LIMIT 1;
+     WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
 
@@ -78,7 +78,7 @@ CREATE OR REPLACE FUNCTION geoip_country(p_ip INET, OUT begin_ip INET, OUT end_i
                                                          OUT country CHAR(2), OUT name VARCHAR(100)) AS $$
 
     SELECT begin_ip, end_ip, country, name
-      FROM geoip_country WHERE $1 >= begin_ip ORDER BY begin_ip DESC LIMIT 1;
+      FROM geoip_country WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
 
@@ -87,7 +87,7 @@ CREATE OR REPLACE FUNCTION geoip_asn(p_ip INET, OUT begin_ip INET, OUT end_ip IN
                                                 OUT name VARCHAR(100)) AS $$
 
     SELECT begin_ip, end_ip, name
-      FROM geoip_asn WHERE $1 >= begin_ip ORDER BY begin_ip DESC LIMIT 1;
+      FROM geoip_asn WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
 

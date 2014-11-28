@@ -13,10 +13,20 @@ SELECT geoip_country_code('78.45.133.255'::inet);
 
 SELECT * FROM geoip_country('78.45.133.255'::inet);
 
--- no matching country record
+-- no matching country record (before the first IP)
 SELECT geoip_country_code('10.45.133.255'::inet);
 
 SELECT * FROM geoip_country_code('10.45.133.255'::inet);
+
+-- no matching country record (between records)
+SELECT geoip_country_code('78.43.1.1'::inet);
+
+SELECT * FROM geoip_country_code('78.43.1.1'::inet);
+
+-- no matching country record (after the last IP)
+SELECT geoip_country_code('79.43.1.1'::inet);
+
+SELECT * FROM geoip_country_code('79.43.1.1'::inet);
 
 INSERT INTO geoip_city_location(loc_id, country, region, city, postal_code, latitude, longitude, metro_code, area_code) VALUES (21235, 'CZ', 52, 'A', NULL, 50.0833, 14.4667, NULL, NULL);
 INSERT INTO geoip_city_location(loc_id, country, region, city, postal_code, latitude, longitude, metro_code, area_code) VALUES (37990, 'CZ', 78, 'B', NULL, 49.2, 16.6333, NULL, NULL);
@@ -31,10 +41,20 @@ SELECT geoip_city_location('31.7.243.10'::inet);
 
 SELECT * FROM geoip_city('31.7.243.10'::inet);
 
--- no matching city record
+-- no matching city record (before the first IP)
 SELECT geoip_city_location('10.7.243.10'::inet);
 
 SELECT * FROM geoip_city('10.7.243.10'::inet);
+
+-- no matching city record (between the records)
+SELECT geoip_city_location('40.1.1.1'::inet);
+
+SELECT * FROM geoip_city('40.1.1.1'::inet);
+
+-- no matching city record (after the last IP)
+SELECT geoip_city_location('47.1.1.1'::inet);
+
+SELECT * FROM geoip_city('47.1.1.1'::inet);
 
 INSERT INTO geoip_asn(begin_ip, end_ip, name) VALUES ('1.11.64.0', '1.11.95.255', 'AS38091 CJ-CABLENET');
 INSERT INTO geoip_asn(begin_ip, end_ip, name) VALUES ('1.11.96.0', '1.11.127.255', 'AS38669 ChungNam Broadcastin Co.');
