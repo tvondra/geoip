@@ -1,5 +1,5 @@
 # geoip extension
 comment = 'An IP geolocation extension (a wrapper around the MaxMind GeoLite dataset)'
-default_version = '0.2.1'
+default_version = '0.2.2'
 module_pathname = '$libdir/geoip'
 relocatable = true
