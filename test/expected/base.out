@@ -1,4 +1,4 @@
-\set ECHO 0
+\set ECHO none
  geoip_country_code 
 --------------------
  CC

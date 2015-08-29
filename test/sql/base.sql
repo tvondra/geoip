@@ -1,8 +1,8 @@
-\set ECHO 0
+\set ECHO none
 BEGIN;
 
 SET client_min_messages = 'WARNING';
-\i sql/geoip--0.2.1.sql
+\i sql/geoip--0.2.4.sql
 
 INSERT INTO geoip_country(begin_ip, end_ip, country, name) VALUES ('78.31.24.0',   '78.31.31.255', 'AA', 'Country A');
 INSERT INTO geoip_country(begin_ip, end_ip, country, name) VALUES ('78.41.8.0',    '78.41.23.255', 'BB', 'Country B');
