@@ -113,3 +113,91 @@ CREATE OR REPLACE FUNCTION geoip_asn(p_ip ipaddress, OUT network iprange, OUT as
       FROM @extschema@.geoip_asn_blocks WHERE $1 <<= network ORDER BY network DESC LIMIT 1;
 
 $$ LANGUAGE sql;
+
+/** functions used to search data by IP **/
+
+-- check consistency of the country table
+CREATE OR REPLACE FUNCTION geoip_country_check() RETURNS BOOLEAN AS $$
+DECLARE
+    v_previous RECORD;
+    v_block    RECORD;
+    v_first    BOOLEAN := TRUE;
+    v_valid    BOOLEAN := TRUE;
+BEGIN
+
+    FOR v_block IN SELECT network, lower(network) AS begin_ip, upper(network) AS end_ip FROM @extschema@.geoip_country_blocks ORDER BY family(network), begin_ip ASC LOOP
+
+        IF (NOT v_first) THEN
+
+            IF (family(v_block.network) != family(v_previous.network)) AND (v_previous.end_ip >= v_block.begin_ip) THEN
+                RAISE WARNING 'ranges % and % overlap, end % start %', v_previous.network, v_block.network, v_previous.end_ip, v_block.begin_ip;
+                v_valid := FALSE;
+            END IF;
+
+        END IF;
+
+        v_first := FALSE;
+        v_previous := v_block;
+
+    END LOOP;
+
+    RETURN v_valid;
+
+END;
+$$ LANGUAGE plpgsql;
+
+-- check consistency of the city table
+CREATE OR REPLACE FUNCTION geoip_city_check() RETURNS BOOLEAN AS $$
+DECLARE
+    v_previous RECORD;
+    v_block    RECORD;
+    v_first    BOOLEAN := TRUE;
+    v_valid    BOOLEAN := TRUE;
+BEGIN
+
+    FOR v_block IN SELECT network, lower(network) AS begin_ip, upper(network) AS end_ip FROM @extschema@.geoip_city_blocks ORDER BY family(network), begin_ip ASC LOOP
+
+        IF (NOT v_first) THEN
+            IF (family(v_block.network) != family(v_previous.network)) AND (v_previous.end_ip >= v_block.begin_ip) THEN
+                RAISE WARNING 'ranges % and % overlap, end % start %', v_previous.network, v_block.network, v_previous.end_ip, v_block.begin_ip;
+                v_valid := FALSE;
+            END IF;
+        END IF;
+
+        v_first := FALSE;
+        v_previous := v_block;
+
+    END LOOP;
+
+    RETURN v_valid;
+
+END;
+$$ LANGUAGE plpgsql;
+
+-- check consistency of the ASN table
+CREATE OR REPLACE FUNCTION geoip_asn_check() RETURNS BOOLEAN AS $$
+DECLARE
+    v_previous RECORD;
+    v_block    RECORD;
+    v_first    BOOLEAN := TRUE;
+    v_valid    BOOLEAN := TRUE;
+BEGIN
+
+    FOR v_block IN SELECT network, lower(network) AS begin_ip, upper(network) AS end_ip FROM @extschema@.geoip_asn_blocks ORDER BY family(network), begin_ip ASC LOOP
+
+        IF (NOT v_first) THEN
+            IF (family(v_block.network) != family(v_previous.network)) AND (v_previous.end_ip >= v_block.begin_ip) THEN
+                RAISE WARNING 'ranges % and % overlap, end % start %', v_previous.network, v_block.network, v_previous.end_ip, v_block.begin_ip;
+                v_valid := FALSE;
+            END IF;
+        END IF;
+
+        v_first := FALSE;
+        v_previous := v_block;
+
+    END LOOP;
+
+    RETURN v_valid;
+
+END;
+$$ LANGUAGE plpgsql;
