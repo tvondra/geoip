@@ -22,7 +22,7 @@ and then (if you're on PostgreSQL 9.1 or above)
 For versions of PostgreSQL less than 9.1.0, you'll need to run the
 installation script manually:
 
-    psql -d mydb -f /path/to/pgsql/share/contrib/geoip--0.2.4.sql
+    psql -d mydb -f /path/to/pgsql/share/contrib/geoip--0.3.0.sql
 
 Now you're ready to use the extension. More details about the installation
 options and issues are available in the INSTALL file.
@@ -60,95 +60,80 @@ return a single value
 The functions that return a tuple are a bit more complicated. Probably the
 best way to call them is like a SRF:
 
-    db=# SELECT * FROM geoip_city('78.45.133.255'::inet);
+    db=# SELECT * FROM geoip.geoip_city('78.45.133.255'::inet);
 
-     loc_id | country | region |  city  | latitude | longitude | ...
-    --------+---------+--------+--------+----------+-----------+-----
-      21235 | CZ      | 52     | Prague |  50.0833 |   14.4667 | ...
+     geoname_id | country_iso_code | city_name | postal_code |  ...
+    ------------+------------------+-----------+-------------+- ...
+        3066399 | CZ               | Sardice   | 696 13      |  ...
 
-    db=# SELECT * FROM geoip_country('78.45.133.255'::inet);
+    db=# SELECT * FROM geoip.geoip_country('78.45.133.255'::inet);
 
-     begin_ip  |    end_ip     | country |      name      
-    -----------+---------------+---------+----------------
-     78.44.0.0 | 78.45.255.255 | CZ      | Czech Republic
+        network     | country_iso_code | country_name 
+    ----------------+------------------+--------------
+     78.45.128.0/17 | CZ               | Czechia
     (1 row)
 
-    db=# SELECT * FROM geoip_asn('78.45.133.255'::inet);
+    db=# SELECT * FROM geoip.geoip_asn('78.45.133.255'::inet);
 
-     begin_ip  |    end_ip     |               name                
-    -----------+---------------+-----------------------------------
-     78.44.0.0 | 78.45.255.255 | AS6830 UPC Broadband Holding B.V.
+       network    | asn_number |      asn_name       
+    --------------+------------+---------------------
+     78.44.0.0/15 |       6830 | Liberty Global B.V.
     (1 row)
 
 Sure, you can access the data directly through the tables.
+
+
+Consistency of data
+-------------------
+Correctness of the answers depends on consistency of the GeoIP database.
+
 
 Loading the data
 ----------------
 This extension requires manual downloading and loading the data. Once
 you have the extension installed (so that the tables exist), go to
-http://www.maxmind.com and download the CSV files
+http://www.maxmind.com and download the GeoLite2 CSV files
 
- * http://www.maxmind.com/app/geolitecountry - GeoIPCountryCSV.zip
- * http://www.maxmind.com/app/geolitecity - GeoLiteCity_20120207.zip
- * http://www.maxmind.com/app/asnum - GeoIPASNum2.zip
+ * https://dev.maxmind.com/geoip/geoip2/geolite2/
 
-Now we need to preprocess the CSV files so that it's possible to load
-them into the tables with a COPY. First, unzip the GeoIPCountryCSV.zip
-and remove the two columns with IP addresses encoded as INT values.
+Download all three data sets (City, Country, ASN) in CSV format, and
+extract them. You'll need these CSV files:
 
-    $ unzip GeoIPCountryCSV.zip
-    $ sed 's/^\("[^"]*","[^"]*",\)"[^"]*","[^"]*",\("[^"]*","[^"]*"\)/\1\2/' \
-          GeoIPCountryWhois.csv > countries.csv
+ * GeoLite2-City-Locations-en.csv
+ * GeoLite2-City-Blocks-IPv4.csv
+ * GeoLite2-City-Blocks-IPv6.csv
+ * GeoLite2-Country-Locations-en.csv
+ * GeoLite2-Country-Blocks-IPv4.csv
+ * GeoLite2-Country-Blocks-IPv6.csv
+ * GeoLite2-ASN-Blocks-IPv4.csv
+ * GeoLite2-ASN-Blocks-IPv6.csv
 
-Now unzip the GeoLite city data and remove the first two rows (header)
+The "locations" files have multiple language variants, so pick the one
+that works for you. Then simply load the data using COPY command:
 
-    $ tail -$((`wc -l GeoLiteCity-Blocks.csv | awk '{print $1}'`-2)) \
-      GeoLiteCity-Blocks.csv > blocks.csv
+    $ cat GeoLite2-Country-Locations-en.csv | \
+      psql $DBNAME -c 'COPY geoip.geoip_country_locations FROM stdin WITH (FORMAT CSV, HEADER)'
 
-    $ tail -$((`wc -l GeoLiteCity-Location.csv | awk '{print $1}'`-2)) \
-      GeoLiteCity-Location.csv > locations.csv
+    $ cat GeoLite2-Country-Blocks-IPv4.csv | \
+      psql $DBNAME -c 'COPY geoip.geoip_country_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
 
-It's time to load the data into the database. There's still a bit of
-transforming that needs to be done (and doing it in shell would be
-awkward), so we'll create a few temporary tables. So log in to the
-database and do this (the PATH needs to be replaced with an actual
-absolute path to the files).
+    $ cat GeoLite2-Country-Blocks-IPv6.csv | \
+      psql $DBNAME -c 'COPY geoip.geoip_country_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
 
-    COPY geoip_country FROM 'PATH/countries.csv'
-    WITH csv DELIMITER ',' NULL '' QUOTE '"' ENCODING 'ISO-8859-2';
+    $ cat GeoLite2-City-Locations-en.csv | \
+      psql $DBNAME -c 'COPY geoip.geoip_city_locations FROM stdin WITH (FORMAT CSV, HEADER)'
 
-    CREATE TEMPORARY TABLE geoip_city_block_tmp (
-        begin_ip    BIGINT      NOT NULL,
-        end_ip      BIGINT      NOT NULL,
-        loc_id      INTEGER     NOT NULL
-    );
+    $ cat GeoLite2-City-Blocks-IPv4.csv | \
+      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
 
-    CREATE TEMPORARY TABLE geoip_asn_tmp (
-        begin_ip    BIGINT      NOT NULL,
-        end_ip      BIGINT      NOT NULL,
-        name        TEXT        NOT NULL
-    );
+    $ cat GeoLite2-City-Blocks-IPv6.csv | \
+      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
 
-    COPY geoip_city_block_tmp FROM 'PATH/blocks.csv'
-    WITH csv DELIMITER ',' NULL '' QUOTE '"' ENCODING 'ISO-8859-2';
+    $ cat GeoLite2-ASN-Blocks-IPv4.csv | \
+      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
 
-    COPY geoip_city_location FROM 'PATH/locations.csv'
-    WITH csv DELIMITER ',' NULL '' QUOTE '"' ENCODING 'ISO-8859-2';
-
-    COPY geoip_asn_tmp FROM 'PATH/GeoIPASNum2.csv'
-    WITH csv DELIMITER ',' NULL '' QUOTE '"' ENCODING 'ISO-8859-2';
-
-    INSERT INTO geoip_city_block
-         SELECT geoip_bigint_to_inet(begin_ip),
-                geoip_bigint_to_inet(end_ip), loc_id
-           FROM geoip_city_block_tmp;
-
-    INSERT INTO geoip_asn
-         SELECT geoip_bigint_to_inet(begin_ip),
-                geoip_bigint_to_inet(end_ip), name
-           FROM geoip_asn_tmp;
-
-    ANALYZE;
+    $ cat GeoLite2-ASN-Blocks-IPv6.csv | \
+      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
 
 Now the data is loaded.
 
