@@ -72,8 +72,8 @@ CREATE INDEX geoip_asn_blocks_idx ON geoip_asn_blocks USING gist (network);
 CREATE OR REPLACE FUNCTION geoip_country_code(p_ip ipaddress) RETURNS CHAR(2) AS $$
 
     SELECT country_iso_code
-      FROM @extschema@.geoip_country_blocks JOIN @extschema@.geoip_city_locations USING (geoname_id)
-     WHERE $1 <<= network ORDER BY network DESC LIMIT 1;
+      FROM (SELECT geoname_id FROM @extschema@.geoip_country_blocks WHERE $1 <<= network LIMIT 1) foo
+      JOIN @extschema@.geoip_city_locations USING (geoname_id);
 
 $$ LANGUAGE sql;
 
@@ -81,8 +81,8 @@ $$ LANGUAGE sql;
 CREATE OR REPLACE FUNCTION geoip_city_location(p_ip ipaddress) RETURNS INT AS $$
 
     SELECT geoname_id
-      FROM @extschema@.geoip_city_blocks JOIN @extschema@.geoip_city_locations USING (geoname_id)
-     WHERE $1 <<= network ORDER BY network DESC LIMIT 1;
+      FROM @extschema@.geoip_city_blocks
+     WHERE $1 <<= network LIMIT 1;
 
 $$ LANGUAGE sql;
 
@@ -92,8 +92,8 @@ CREATE OR REPLACE FUNCTION geoip_city(p_ip ipaddress, OUT geoname_id INT, OUT co
                                                 OUT latitude DOUBLE PRECISION, OUT longitude DOUBLE PRECISION) AS $$
 
     SELECT l.geoname_id, country_iso_code, city_name, postal_code, metro_code, latitude, longitude
-      FROM @extschema@.geoip_city_blocks b JOIN @extschema@.geoip_city_locations l USING (geoname_id)
-     WHERE $1 <<= network ORDER BY network DESC LIMIT 1;
+      FROM (SELECT geoname_id, postal_code, latitude, longitude FROM @extschema@.geoip_city_blocks WHERE $1 <<= network LIMIT 1) foo
+      JOIN @extschema@.geoip_city_locations l USING (geoname_id);
 
 $$ LANGUAGE sql;
 
@@ -101,8 +101,8 @@ $$ LANGUAGE sql;
 CREATE OR REPLACE FUNCTION geoip_country(p_ip ipaddress, OUT network iprange, OUT country_iso_code CHAR(2), OUT country_name VARCHAR(100)) AS $$
 
     SELECT network, country_iso_code, country_name
-      FROM @extschema@.geoip_country_blocks JOIN @extschema@.geoip_country_locations USING (geoname_id)
-     WHERE $1 <<= network ORDER BY network DESC LIMIT 1;
+      FROM (SELECT network, geoname_id FROM @extschema@.geoip_country_blocks WHERE $1 <<= network LIMIT 1) foo
+      JOIN @extschema@.geoip_country_locations USING (geoname_id);
 
 $$ LANGUAGE sql;
 
@@ -110,7 +110,7 @@ $$ LANGUAGE sql;
 CREATE OR REPLACE FUNCTION geoip_asn(p_ip ipaddress, OUT network iprange, OUT asn_number INT, OUT asn_name TEXT) AS $$
 
     SELECT network, autonomous_system_number, autonomous_system_organization
-      FROM @extschema@.geoip_asn_blocks WHERE $1 <<= network ORDER BY network DESC LIMIT 1;
+      FROM @extschema@.geoip_asn_blocks WHERE $1 <<= network LIMIT 1;
 
 $$ LANGUAGE sql;
 
