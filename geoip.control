@@ -1,5 +1,6 @@
 # geoip extension
 comment = 'An IP geolocation extension (a wrapper around the MaxMind GeoLite dataset)'
-default_version = '0.2.5'
+default_version = '0.3.0'
 module_pathname = '$libdir/geoip'
 schema = geoip
+requires = 'ip4r'

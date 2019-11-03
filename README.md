@@ -34,23 +34,23 @@ Using the extension
 The extension allows you to search for country, city and ASN. All of that
 is encapsulated into these functions:
 
- * `geoip_country_code(inet)` - returns country code (2 chars)
- * `geoip_country(inet)` - returns all country info (code, name, ...)
- * `geoip_city_location(inet)` - returns just location ID (INT)
- * `geoip_city(inet)` - returns all the city info (GPS, ZIP code, ...)
- * `geoip_asn(inet)` - retusn ASN name and IP range
+ * `geoip_country_code(ip4|ip6)` - returns country code (2 chars)
+ * `geoip_country(ip4|ip6)` - returns all country info (code, name, ...)
+ * `geoip_city_location(ip4|ip6)` - returns just location ID (INT)
+ * `geoip_city(ip4|ip6)` - returns all the city info (GPS, ZIP code, ...)
+ * `geoip_asn(ip4|ip6)` - retusn ASN name and IP range
 
 Using the functions is quite straightforward, especially for functions that
 return a single value
 
-    db=# SELECT geoip_country_code('78.45.133.255'::inet);
+    db=# SELECT geoip_country_code('78.45.133.255'::ip4);
 
      geoip_country_code 
     --------------------
      CZ
     (1 row)
 
-    db=# SELECT geoip_city_location('78.45.133.255'::inet);
+    db=# SELECT geoip_city_location('78.45.133.255'::ip4);
 
      geoip_city_location 
     ---------------------
@@ -60,20 +60,20 @@ return a single value
 The functions that return a tuple are a bit more complicated. Probably the
 best way to call them is like a SRF:
 
-    db=# SELECT * FROM geoip.geoip_city('78.45.133.255'::inet);
+    db=# SELECT * FROM geoip.geoip_city('78.45.133.255'::ip4);
 
      geoname_id | country_iso_code | city_name | postal_code |  ...
     ------------+------------------+-----------+-------------+- ...
         3066399 | CZ               | Sardice   | 696 13      |  ...
 
-    db=# SELECT * FROM geoip.geoip_country('78.45.133.255'::inet);
+    db=# SELECT * FROM geoip.geoip_country('78.45.133.255'::ip4);
 
         network     | country_iso_code | country_name 
     ----------------+------------------+--------------
      78.45.128.0/17 | CZ               | Czechia
     (1 row)
 
-    db=# SELECT * FROM geoip.geoip_asn('78.45.133.255'::inet);
+    db=# SELECT * FROM geoip.geoip_asn('78.45.133.255'::ip4);
 
        network    | asn_number |      asn_name       
     --------------+------------+---------------------
@@ -115,25 +115,25 @@ that works for you. Then simply load the data using COPY command:
       psql $DBNAME -c 'COPY geoip.geoip_country_locations FROM stdin WITH (FORMAT CSV, HEADER)'
 
     $ cat GeoLite2-Country-Blocks-IPv4.csv | \
-      psql $DBNAME -c 'COPY geoip.geoip_country_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
+      psql $DBNAME -c 'COPY geoip.geoip_country_blocks_ipv4 FROM stdin WITH (FORMAT CSV, HEADER)'
 
     $ cat GeoLite2-Country-Blocks-IPv6.csv | \
-      psql $DBNAME -c 'COPY geoip.geoip_country_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
+      psql $DBNAME -c 'COPY geoip.geoip_country_blocks_ipv6 FROM stdin WITH (FORMAT CSV, HEADER)'
 
     $ cat GeoLite2-City-Locations-en.csv | \
       psql $DBNAME -c 'COPY geoip.geoip_city_locations FROM stdin WITH (FORMAT CSV, HEADER)'
 
     $ cat GeoLite2-City-Blocks-IPv4.csv | \
-      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
+      psql $DBNAME -c 'COPY geoip.geoip_city_blocks_ipv4 FROM stdin WITH (FORMAT CSV, HEADER)'
 
     $ cat GeoLite2-City-Blocks-IPv6.csv | \
-      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
+      psql $DBNAME -c 'COPY geoip.geoip_city_blocks_ipv6 FROM stdin WITH (FORMAT CSV, HEADER)'
 
     $ cat GeoLite2-ASN-Blocks-IPv4.csv | \
-      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
+      psql $DBNAME -c 'COPY geoip.geoip_city_blocks_ipv4 FROM stdin WITH (FORMAT CSV, HEADER)'
 
     $ cat GeoLite2-ASN-Blocks-IPv6.csv | \
-      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
+      psql $DBNAME -c 'COPY geoip.geoip_city_blocks_ipv6 FROM stdin WITH (FORMAT CSV, HEADER)'
 
 Now the data is loaded.
 
