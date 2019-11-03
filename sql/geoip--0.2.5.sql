@@ -1,8 +1,8 @@
 /*
  * Author: Tomas Vondra
- *
  * Created at: Sat Mar 31 22:51:21 +0200 2012
- */
+ *
+ */ 
 
 CREATE TABLE geoip_country (
     begin_ip    INET            NOT NULL,
@@ -47,7 +47,7 @@ CREATE INDEX geoip_asn_ip_idx ON geoip_asn (begin_ip DESC);
 CREATE OR REPLACE FUNCTION geoip_country_code(p_ip INET) RETURNS CHAR(2) AS $$
 
     SELECT country
-      FROM geoip_country
+      FROM @extschema@.geoip_country
      WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
@@ -56,7 +56,7 @@ $$ LANGUAGE sql;
 CREATE OR REPLACE FUNCTION geoip_city_location(p_ip INET) RETURNS INT AS $$
 
     SELECT loc_id
-      FROM geoip_city_block
+      FROM @extschema@.geoip_city_block
      WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
@@ -68,7 +68,7 @@ CREATE OR REPLACE FUNCTION geoip_city(p_ip INET, OUT loc_id INT, OUT country CHA
                                                  OUT metro_code INT, OUT area_code INT) AS $$
 
     SELECT l.loc_id, country, region, city, postal_code, latitude, longitude, metro_code, area_code
-      FROM geoip_city_block b JOIN geoip_city_location l ON (b.loc_id = l.loc_id)
+      FROM @extschema@.geoip_city_block b JOIN @extschema@.geoip_city_location l ON (b.loc_id = l.loc_id)
      WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
@@ -78,7 +78,7 @@ CREATE OR REPLACE FUNCTION geoip_country(p_ip INET, OUT begin_ip INET, OUT end_i
                                                          OUT country CHAR(2), OUT name VARCHAR(100)) AS $$
 
     SELECT begin_ip, end_ip, country, name
-      FROM geoip_country WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
+      FROM @extschema@.geoip_country WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
 
@@ -87,7 +87,7 @@ CREATE OR REPLACE FUNCTION geoip_asn(p_ip INET, OUT begin_ip INET, OUT end_ip IN
                                                 OUT name VARCHAR(100)) AS $$
 
     SELECT begin_ip, end_ip, name
-      FROM geoip_asn WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
+      FROM @extschema@.geoip_asn WHERE $1 >= begin_ip AND $1 <= end_ip ORDER BY begin_ip DESC LIMIT 1;
 
 $$ LANGUAGE sql;
 
@@ -102,7 +102,7 @@ DECLARE
     v_valid    BOOLEAN := TRUE;
 BEGIN
 
-    FOR v_country IN SELECT * FROM geoip_country ORDER BY begin_ip ASC LOOP
+    FOR v_country IN SELECT * FROM @extschema@.geoip_country ORDER BY begin_ip ASC LOOP
 
         IF (NOT v_first) THEN
             v_first := FALSE;
@@ -131,7 +131,7 @@ DECLARE
     v_valid    BOOLEAN := TRUE;
 BEGIN
 
-    FOR v_block IN SELECT begin_ip, end_ip FROM geoip_city_block ORDER BY begin_ip ASC LOOP
+    FOR v_block IN SELECT begin_ip, end_ip FROM @extschema@.geoip_city_block ORDER BY begin_ip ASC LOOP
 
         IF (NOT v_first) THEN
             v_first := FALSE;
@@ -160,7 +160,7 @@ DECLARE
     v_valid    BOOLEAN := TRUE;
 BEGIN
 
-    FOR v_block IN SELECT begin_ip, end_ip FROM geoip_asn ORDER BY begin_ip ASC LOOP
+    FOR v_block IN SELECT begin_ip, end_ip FROM @extschema@.geoip_asn ORDER BY begin_ip ASC LOOP
 
         IF (NOT v_first) THEN
             v_first := FALSE;
@@ -180,6 +180,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION geoip_bigint_to_inet(p_ip BIGINT) RETURNS inet AS $$
+CREATE OR REPLACE FUNCTION @extschema@.geoip_bigint_to_inet(p_ip BIGINT) RETURNS inet AS $$
     SELECT (($1 >> 24 & 255) || '.' || ($1 >> 16 & 255) || '.' || ($1 >> 8 & 255) || '.' || ($1 & 255))::inet
 $$ LANGUAGE sql strict immutable;
