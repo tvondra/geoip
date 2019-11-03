@@ -22,7 +22,7 @@ and then (if you're on PostgreSQL 9.1 or above)
 For versions of PostgreSQL less than 9.1.0, you'll need to run the
 installation script manually:
 
-    psql -d mydb -f /path/to/pgsql/share/contrib/geoip.sql
+    psql -d mydb -f /path/to/pgsql/share/contrib/geoip--0.2.4.sql
 
 Now you're ready to use the extension. More details about the installation
 options and issues are available in the INSTALL file.
@@ -34,11 +34,11 @@ Using the extension
 The extension allows you to search for country, city and ASN. All of that
 is encapsulated into these functions:
 
- * geoip_country_code(inet) - returns country code (2 chars)
- * geoip_country(inet) - returns all country info (code, name, ...)
- * geoip_city_location(inet) - returns just location ID (INT)
- * geoip_city(inet) - returns all the city info (GPS, ZIP code, ...)
- * geoip_asn(inet) - retusn ASN name and IP range
+ * `geoip_country_code(inet)` - returns country code (2 chars)
+ * `geoip_country(inet)` - returns all country info (code, name, ...)
+ * `geoip_city_location(inet)` - returns just location ID (INT)
+ * `geoip_city(inet)` - returns all the city info (GPS, ZIP code, ...)
+ * `geoip_asn(inet)` - retusn ASN name and IP range
 
 Using the functions is quite straightforward, especially for functions that
 return a single value
