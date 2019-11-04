@@ -44,9 +44,9 @@
                21235
 (1 row)
 
- loc_id | country | region | city | postal_code | latitude | longitude | metro_code | area_code 
---------+---------+--------+------+-------------+----------+-----------+------------+-----------
-  21235 | CZ      | 52     | A    |             |  50.0833 |   14.4667 |            |          
+ geoname_id | country_iso_code | city_name | postal_code | metro_code | latitude | longitude 
+------------+------------------+-----------+-------------+------------+----------+-----------
+      21235 | CZ               | City A    | postal A    | metro A    |  50.0833 |   14.4667
 (1 row)
 
  geoip_city_location 
@@ -54,9 +54,9 @@
                     
 (1 row)
 
- loc_id | country | region | city | postal_code | latitude | longitude | metro_code | area_code 
---------+---------+--------+------+-------------+----------+-----------+------------+-----------
-        |         |        |      |             |          |           |            |          
+ geoname_id | country_iso_code | city_name | postal_code | metro_code | latitude | longitude 
+------------+------------------+-----------+-------------+------------+----------+-----------
+            |                  |           |             |            |          |          
 (1 row)
 
  geoip_city_location 
@@ -64,9 +64,9 @@
                     
 (1 row)
 
- loc_id | country | region | city | postal_code | latitude | longitude | metro_code | area_code 
---------+---------+--------+------+-------------+----------+-----------+------------+-----------
-        |         |        |      |             |          |           |            |          
+ geoname_id | country_iso_code | city_name | postal_code | metro_code | latitude | longitude 
+------------+------------------+-----------+-------------+------------+----------+-----------
+            |                  |           |             |            |          |          
 (1 row)
 
  geoip_city_location 
@@ -74,18 +74,18 @@
                     
 (1 row)
 
- loc_id | country | region | city | postal_code | latitude | longitude | metro_code | area_code 
---------+---------+--------+------+-------------+----------+-----------+------------+-----------
-        |         |        |      |             |          |           |            |          
+ geoname_id | country_iso_code | city_name | postal_code | metro_code | latitude | longitude 
+------------+------------------+-----------+-------------+------------+----------+-----------
+            |                  |           |             |            |          |          
 (1 row)
 
- begin_ip  |   end_ip    |        name         
------------+-------------+---------------------
- 1.11.64.0 | 1.11.95.255 | AS38091 CJ-CABLENET
+ begin_ip  |   end_ip    | asn_number |  asn_name   
+-----------+-------------+------------+-------------
+ 1.11.64.0 | 1.11.95.255 |      38091 | CJ-CABLENET
 (1 row)
 
- begin_ip | end_ip | name 
-----------+--------+------
-          |        | 
+ begin_ip | end_ip | asn_number | asn_name 
+----------+--------+------------+----------
+          |        |            | 
 (1 row)
 

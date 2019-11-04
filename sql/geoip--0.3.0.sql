@@ -73,7 +73,7 @@ CREATE OR REPLACE FUNCTION geoip_country_code(p_ip ipaddress) RETURNS CHAR(2) AS
 
     SELECT country_iso_code
       FROM (SELECT geoname_id FROM @extschema@.geoip_country_blocks WHERE $1 <<= network LIMIT 1) foo
-      JOIN @extschema@.geoip_city_locations USING (geoname_id);
+      JOIN @extschema@.geoip_country_locations USING (geoname_id);
 
 $$ LANGUAGE sql;
 
