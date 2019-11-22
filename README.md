@@ -130,10 +130,10 @@ that works for you. Then simply load the data using COPY command:
       psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
 
     $ cat GeoLite2-ASN-Blocks-IPv4.csv | \
-      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
+      psql $DBNAME -c 'COPY geoip.geoip_asn_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
 
     $ cat GeoLite2-ASN-Blocks-IPv6.csv | \
-      psql $DBNAME -c 'COPY geoip.geoip_city_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
+      psql $DBNAME -c 'COPY geoip.geoip_asn_blocks FROM stdin WITH (FORMAT CSV, HEADER)'
 
 Now the data is loaded.
 
