@@ -15,6 +15,18 @@ To install the extension, basically all you need to do is this
 
     make install
 
+Download and install ip4r extension
+
+git clone https://github.com/RhodiumToad/ip4r.git
+
+    cd ip4r
+    make
+    make install
+
+then on postgresSQL 9.1 or above
+
+     CREATE EXTENSION ip4r;
+
 and then (if you're on PostgreSQL 9.1 or above)
 
     CREATE EXTENSION geoip;
