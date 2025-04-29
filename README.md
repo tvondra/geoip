@@ -6,7 +6,7 @@ address and the extension looks for info about country, city, GPS etc.
 
 To operate, the extension needs data mapping IP addresses to the other
 info, but these data are not part of the extension. A good free dataset
-is GeoLite from MaxMind (available at www.maxmind.com).
+is GeoLite from MaxMind (available at <www.maxmind.com>).
 
 Installation
 ------------
@@ -34,11 +34,10 @@ and then (if you're on PostgreSQL 9.1 or above)
 For versions of PostgreSQL less than 9.1.0, you'll need to run the
 installation script manually:
 
-    psql -d mydb -f /path/to/pgsql/share/contrib/geoip--0.3.0.sql
+    psql -d mydb -f /path/to/pgsql/share/contrib/geoip--0.4.0.sql
 
 Now you're ready to use the extension. More details about the installation
 options and issues are available in the INSTALL file.
-
 
 Using the extension
 -------------------
@@ -46,11 +45,11 @@ Using the extension
 The extension allows you to search for country, city and ASN. All of that
 is encapsulated into these functions:
 
- * `geoip_country_code(ip4|ip6)` - returns country code (2 chars)
- * `geoip_country(ip4|ip6)` - returns all country info (code, name, ...)
- * `geoip_city_location(ip4|ip6)` - returns just location ID (INT)
- * `geoip_city(ip4|ip6)` - returns all the city info (GPS, ZIP code, ...)
- * `geoip_asn(ip4|ip6)` - retusn ASN name and IP range
+* `geoip_country_code(ip4|ip6)` - returns country code (2 chars)
+* `geoip_country(ip4|ip6)` - returns all country info (code, name, ...)
+* `geoip_city_location(ip4|ip6)` - returns just location ID (INT)
+* `geoip_city(ip4|ip6)` - returns all the city info (GPS, ZIP code, ...)
+* `geoip_asn(ip4|ip6)` - retusn ASN name and IP range
 
 Using the functions is quite straightforward, especially for functions that
 return a single value
@@ -94,31 +93,31 @@ best way to call them is like a SRF:
 
 Sure, you can access the data directly through the tables.
 
-
 Consistency of data
 -------------------
-Correctness of the answers depends on consistency of the GeoIP database.
 
+Correctness of the answers depends on consistency of the GeoIP database.
 
 Loading the data
 ----------------
+
 This extension requires manual downloading and loading the data. Once
 you have the extension installed (so that the tables exist), go to
-http://www.maxmind.com and download the GeoLite2 CSV files
+<http://www.maxmind.com> and download the GeoLite2 CSV files
 
- * https://dev.maxmind.com/geoip/geoip2/geolite2/
+* <https://dev.maxmind.com/geoip/geoip2/geolite2/>
 
 Download all three data sets (City, Country, ASN) in CSV format, and
 extract them. You'll need these CSV files:
 
- * GeoLite2-City-Locations-en.csv
- * GeoLite2-City-Blocks-IPv4.csv
- * GeoLite2-City-Blocks-IPv6.csv
- * GeoLite2-Country-Locations-en.csv
- * GeoLite2-Country-Blocks-IPv4.csv
- * GeoLite2-Country-Blocks-IPv6.csv
- * GeoLite2-ASN-Blocks-IPv4.csv
- * GeoLite2-ASN-Blocks-IPv6.csv
+* GeoLite2-City-Locations-en.csv
+* GeoLite2-City-Blocks-IPv4.csv
+* GeoLite2-City-Blocks-IPv6.csv
+* GeoLite2-Country-Locations-en.csv
+* GeoLite2-Country-Blocks-IPv4.csv
+* GeoLite2-Country-Blocks-IPv6.csv
+* GeoLite2-ASN-Blocks-IPv4.csv
+* GeoLite2-ASN-Blocks-IPv6.csv
 
 The "locations" files have multiple language variants, so pick the one
 that works for you. Then simply load the data using COPY command:
@@ -149,8 +148,8 @@ that works for you. Then simply load the data using COPY command:
 
 Now the data is loaded.
 
-
 Copyright and License
 ---------------------
-Copyright (c) 2012 Tomas Vondra
+
+Copyright (c) 2025 Tomas Vondra
 The extension is distributed under BSD license (see the LICENSE file)
