@@ -3,7 +3,7 @@ BEGIN;
 
 SET client_min_messages = 'WARNING';
 CREATE EXTENSION ip4r;
-CREATE EXTENSION geoip VERSION '0.3.0';
+CREATE EXTENSION geoip VERSION '0.4.0';
 
 INSERT INTO geoip.geoip_country_locations (geoname_id, locale_code, country_iso_code, country_name) VALUES (1, 'aa', 'AA', 'Country A');
 INSERT INTO geoip.geoip_country_locations (geoname_id, locale_code, country_iso_code, country_name) VALUES (2, 'bb', 'BB', 'Country B');
