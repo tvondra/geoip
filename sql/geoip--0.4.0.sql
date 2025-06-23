@@ -24,7 +24,6 @@ CREATE TABLE geoip_country_blocks (
     represented_country_id INT,
     is_anonymous_proxy     BOOL NOT NULL,
     is_satellite_provider  BOOL NOT NULL,
-    is_anycast             BOOL,
     is_anycast             BOOL
 );
 
@@ -57,7 +56,8 @@ CREATE TABLE geoip_city_blocks (
     postal_code            TEXT,
     latitude               DOUBLE PRECISION,
     longitude              DOUBLE PRECISION,
-    accuracy_radius        DOUBLE PRECISION
+    accuracy_radius        DOUBLE PRECISION,
+    is_anycast             BOOL
 );
 
 /* IPv4/IPv6 blocks for autonomous systems */
